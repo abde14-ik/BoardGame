@@ -1,28 +1,46 @@
 pipeline {
     agent any
-    
+
     tools {
         maven 'maven3'
         jdk 'jdk17'
     }
 
     stages {
-        
         stage('Compile') {
             steps {
-             sh 'mvn compile'
+                sh 'mvn compile'
             }
         }
-        stage('test') {
+
+        stage('Test with Coverage') {
             steps {
-                sh 'mvn test'
+                sh 'mvn clean test'
             }
         }
+
         stage('Package') {
             steps {
-               sh 'mvn package'
+                sh 'mvn package'
             }
         }
+
+        stage('Static Code Analysis (SonarQube)') {
+            steps {
+                withSonarQubeEnv('SonarQubeServer') {
+                    sh 'mvn sonar:sonar'
+                }
+            }
+        }
+
+        stage('Trivy Scan') {
+            steps {
+                sh '''
+                    trivy fs --scanners config,secret,vuln . || true
+                '''
+            }
+        }
+
         stage('Hello') {
             steps {
                 echo 'Hello World'
