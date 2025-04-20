@@ -1,36 +1,59 @@
 pipeline {
     agent any
-    
+
     tools {
-        maven 'maven3'
-        jdk 'jdk17'
+        maven 'maven3'     // Make sure 'maven3' is configured in Jenkins
+        jdk 'jdk17'        // Make sure 'jdk17' is configured in Jenkins
+    }
+
+    environment {
+        // Optional: you can set common env vars here if needed
     }
 
     stages {
-        stage('New-Jenkinsfile') {
+        stage('Start') {
             steps {
-                echo 'New Jenkinsfile'
+                echo '🏗️ Starting new Jenkins pipeline...'
             }
         }
+
         stage('Compile') {
             steps {
-             sh 'mvn compile'
+                echo '🔧 Compiling source code...'
+                sh 'mvn compile'
             }
         }
-        stage('test') {
+
+        stage('Test') {
             steps {
+                echo '🧪 Running unit tests...'
                 sh 'mvn test'
             }
         }
+
         stage('Package') {
             steps {
-               sh 'mvn package'
+                echo '📦 Packaging the application...'
+                sh 'mvn package'
             }
         }
-        stage('Hello') {
+
+        stage('Done') {
             steps {
-                echo 'Hello World'
+                echo '✅ Build stages complete!'
             }
+        }
+    }
+
+    post {
+        always {
+            echo '📬 Pipeline execution finished (success/failure)'
+        }
+        success {
+            echo '🎉 Build completed successfully!'
+        }
+        failure {
+            echo '❌ Build failed. Please check logs.'
         }
     }
 }
